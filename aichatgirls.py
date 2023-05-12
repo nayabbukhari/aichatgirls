@@ -1,5 +1,4 @@
 # TODO: show when the bot is "typing"
-# TODO: add "reset" command to clear chat history
 # TODO: try/except on requests, handle disconnects
 # TODO: when the chat_history gets long oobabooga cuts off the context; make sure it gets preserved
 import discord
@@ -13,7 +12,7 @@ from loadCharacterCard import load_character_card
 from dotenv import load_dotenv
 load_dotenv()
 
-MODEL_MAX_TOKENS = 2048
+MODEL_MAX_TOKENS = 648
 AVERAGE_CHARACTERS_PER_TOKEN = 3.525
 MAX_CHAT_HISTORY_LENGTH = int(MODEL_MAX_TOKENS * AVERAGE_CHARACTERS_PER_TOKEN * 0.9)
 
@@ -31,9 +30,6 @@ client = discord.Client(intents=discord.Intents.all())
 headers = {
     "Content-Type": "application/json"
 }
-
-character = {}
-context = ""
 
 @client.event
 async def on_ready():
@@ -89,7 +85,7 @@ async def on_message(message):
 
             # Append the original message and text response to the chat history
             chat_history += f"\n{message.author.name}: {message.content}\n{character.name}: {text_response}"
-            chatHistory.save_chat_history(chat_history)
+            chatHistory.save_chat_history(message.author, character.name, chat_history)
 
             if isinstance(message.channel, discord.DMChannel):
                 await message.author.send(text_response)
